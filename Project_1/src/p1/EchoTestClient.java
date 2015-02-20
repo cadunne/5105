@@ -1,8 +1,9 @@
+package p1;
 
 import java.net.*;
 import java.io.*;
 
-public class EchoClient   {
+public class EchoTestClient   {
 
   protected String host, file;
   protected int port;
@@ -22,7 +23,9 @@ public class EchoClient   {
 
     System.out.println ("Connecting to " + host + ":" + port + "..");
 
-    Socket socket = new Socket (host, port);
+    Socket socket = new Socket ( );
+    InetSocketAddress addr = new InetSocketAddress(host, port);//new code
+    socket.connect( addr, port ); //addr used to be host
     System.out.println ("Connected.");
 
     OutputStream rawOut = socket.getOutputStream ();
@@ -32,14 +35,21 @@ public class EchoClient   {
 
     BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 
-    String line ;
-    while ( ( line = keyboard.readLine() ) != null ) {
-            printer.println( line );
+    String line1, line2 ;
+//    while ( ( line = keyboard.readLine() ) != null ) {
+
+
+    while ( (line1 = keyboard.readLine()) != null) {
+            printer.println(line1);
             printer.flush();
+            System.out.println("echo: " + buffreader.readLine());
+            // line2 = buffreader.readLine();
+            // System.out.println( line2 );
     }
 
-    while ( ( line = buffreader.readLine() ) != null ) {
-            System.out.println( line );
-    }
+    // while ((userInput = stdIn.readLine()) != null) {
+    //             out.println(userInput);
+    //             System.out.println("echo: " + in.readLine());
+    //         }
   }
 }

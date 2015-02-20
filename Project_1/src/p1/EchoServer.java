@@ -1,7 +1,12 @@
+package p1;
+
 import java.net.*;
 import java.io.*;
 import java.lang.Thread;
 import java.util.Hashtable;
+
+import p1.Request;
+
 
 public class EchoServer extends Thread {
   protected Socket s;
@@ -31,10 +36,6 @@ public class EchoServer extends Thread {
         System.err.println("IOException: " + ioe.getMessage());
     }
 
-    System.out.println("Size: "+ int_to_string.size());
-    int_to_string.put(1, "one");
-    System.out.println("Size: "+ int_to_string.size());
-
  
 
     try {
@@ -46,10 +47,17 @@ public class EchoServer extends Thread {
       int read;
       while ((read = istream.read (buffer)) >= 0) {
         ostream.write (buffer, 0, read);
-        System.out.write (buffer, 0, read);
-        System.out.flush();
+
+        String s = new String(buffer).replaceAll(" ","");
+        System.out.println("new string got: " + s);
+        // System.out.write (buffer, 0, read);
+        int_to_string.put(s.hashCode(), s);
+
+        // System.out.flush();
       }
       System.out.println ("Client exit.");
+      System.out.println("Hash table: " + int_to_string);
+
     } catch (IOException ex) {
       ex.printStackTrace ();
     } finally {
@@ -64,6 +72,9 @@ public class EchoServer extends Thread {
   public static void main (String args[]) throws IOException {
 
     //delete file log to start new one.
+
+    Request req = new GetBalanceRequest(55);
+    System.out.println(req.getType());
 
     Hashtable<Integer, String> newHt = new Hashtable<Integer, String>();
 

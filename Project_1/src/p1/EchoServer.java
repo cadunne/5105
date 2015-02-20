@@ -6,6 +6,7 @@ import java.lang.Thread;
 import java.util.Hashtable;
 
 import p1.Request;
+import p1.Account;
 
 
 public class EchoServer extends Thread {
@@ -96,7 +97,10 @@ public class EchoServer extends Thread {
     //delete file log to start new one.
 
     Request req = new GetBalanceRequest(55);
-    System.out.println(req.getType());
+    System.out.println(req.getType() + "\n");
+
+    Account acc = new Account(155, 0, "FN", "LN", "addrrrrr");
+    System.out.println(acc);
 
     Hashtable<Integer, String> newHt = new Hashtable<Integer, String>();
 

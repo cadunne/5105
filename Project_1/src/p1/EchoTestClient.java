@@ -28,6 +28,17 @@ public class EchoTestClient   {
     socket.connect( addr, port ); //addr used to be host
     System.out.println ("Connected.");
 
+
+
+
+    OutputStream out = socket.getOutputStream ();
+    ObjectOutputStream os = new ObjectOutputStream( out );
+
+    os.writeObject( new NewAccountRequest("aaa", "lastname", "addr```"));
+    socket.close();
+
+    /*
+
     OutputStream rawOut = socket.getOutputStream ();
     InputStream rawIn = socket.getInputStream ();
     BufferedReader  buffreader = new BufferedReader( new InputStreamReader(rawIn) );
@@ -43,13 +54,9 @@ public class EchoTestClient   {
             printer.println(line1);
             printer.flush();
             System.out.println("echo: " + buffreader.readLine());
-            // line2 = buffreader.readLine();
-            // System.out.println( line2 );
     }
+    */
 
-    // while ((userInput = stdIn.readLine()) != null) {
-    //             out.println(userInput);
-    //             System.out.println("echo: " + in.readLine());
-    //         }
+
   }
 }

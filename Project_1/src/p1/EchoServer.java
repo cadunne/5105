@@ -40,9 +40,31 @@ public class EchoServer extends Thread {
 
     try {
       InputStream istream = s.getInputStream ();
+      ObjectInputStream oin = new ObjectInputStream (istream); //NEW
       OutputStream ostream = s.getOutputStream ();
       PrintWriter outp = new PrintWriter (ostream, true);
       outp.println ("Welcome to the multithreaded echo server."); //not being written right away
+
+      Request newReq = null;
+
+      // Date date = null;
+      // String name = null;
+      try {
+        newReq = (Request) oin.readObject();
+        System.out.println(newReq.getType());
+        System.out.println(newReq);
+
+         // date = (Date) oin.readObject();
+         // name = (String) oin.readObject();
+      }
+      catch ( ClassNotFoundException e) {
+         e.printStackTrace();
+      }
+
+      // System.out.println( "Name: "+  name+  ", Date: "+ date );
+
+
+      /*
       byte buffer[] = new byte[16];
       int read;
       while ((read = istream.read (buffer)) >= 0) {
@@ -57,7 +79,7 @@ public class EchoServer extends Thread {
       }
       System.out.println ("Client exit.");
       System.out.println("Hash table: " + int_to_string);
-
+      */
     } catch (IOException ex) {
       ex.printStackTrace ();
     } finally {

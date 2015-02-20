@@ -1,6 +1,6 @@
 package p1;
 
-public class Request {
+public class Request implements java.io.Serializable{
     public String type;
 
     Request(String type){
@@ -22,7 +22,10 @@ class NewAccountRequest extends Request{
 		this.lastName = lastName;
 		this.address = address;
 	}
-	
+
+	public String toString() { 
+	    return "Name: " + this.firstName + this.lastName + this.address + "\n";
+	}
 }
 class DepositRequest extends Request{
 	public int accountID, amount;

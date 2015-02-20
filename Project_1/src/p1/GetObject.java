@@ -16,7 +16,7 @@ public class GetObject {
       System.out.println ("Waiting for a client request");
       Socket client = server.accept ();
 	  
-	  InputStream in  = client.getInputStream();
+      InputStream in  = client.getInputStream();
       ObjectInputStream oin = new ObjectInputStream( in );
       Date date = null;
       String name = null;

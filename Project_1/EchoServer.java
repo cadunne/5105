@@ -1,14 +1,17 @@
 import java.net.*;
 import java.io.*;
-// import java.lang.Thread;
+import java.lang.Thread;
+import java.util.Hashtable;
 
 public class EchoServer extends Thread {
   protected Socket s;
   protected FileWriter fileLog;
+  protected Hashtable<Integer, String> int_to_string; //change to store better data
 
-  EchoServer (Socket s) {
+  EchoServer (Socket s, Hashtable<Integer, String> ht) {
     System.out.println ("New client.");
     this.s = s;
+    this.int_to_string = ht;
     try{
       this.fileLog = new FileWriter("MyFile.txt", true);
     }
@@ -27,6 +30,12 @@ public class EchoServer extends Thread {
     {
         System.err.println("IOException: " + ioe.getMessage());
     }
+
+    System.out.println("Size: "+ int_to_string.size());
+    int_to_string.put(1, "one");
+    System.out.println("Size: "+ int_to_string.size());
+
+ 
 
     try {
       InputStream istream = s.getInputStream ();
@@ -56,6 +65,8 @@ public class EchoServer extends Thread {
 
     //delete file log to start new one.
 
+    Hashtable<Integer, String> newHt = new Hashtable<Integer, String>();
+
     if (args.length != 1)
          throw new RuntimeException ("Syntax: EchoServer port-number");
 
@@ -66,7 +77,7 @@ public class EchoServer extends Thread {
       System.out.println ("Waiting for a client request");
       Socket client = server.accept ();
       System.out.println ("Received request from " + client.getInetAddress ());
-      EchoServer c = new EchoServer (client);
+      EchoServer c = new EchoServer (client, newHt);
       c.start ();
     }
   }

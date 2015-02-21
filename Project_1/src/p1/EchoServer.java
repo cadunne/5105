@@ -12,20 +12,24 @@ import p1.Account;
 
 public class EchoServer extends Thread {
   protected Socket s;
-  protected FileWriter fileLog;
   protected Hashtable<Integer, Account> hTable;
 
   EchoServer (Socket s, Hashtable<Integer, Account> ht) {
     System.out.println ("New client.");
     this.s = s;
     this.hTable = ht;
-    try{
-      this.fileLog = new FileWriter("MyFile.txt", true);
-    }
-    catch(IOException ioe){
-        System.err.println("IOException: " + ioe.getMessage());
-    }
   } 
+
+  private synchronized void writeToLog(String contents){
+    try{
+        FileWriter fw = new FileWriter("serverLogFile.txt", true);
+        fw.write(contents + "\n");
+        fw.flush();
+      }
+      catch(IOException e){
+        e.printStackTrace();
+      }
+  }
 
 
   private synchronized int makeNewAccount(String firstName, String lastName, String address){
@@ -33,8 +37,6 @@ public class EchoServer extends Thread {
 
     Account acc = new Account(accountID, 0, firstName, lastName, address); //fix accountID
     this.hTable.put(accountID, acc);
-
-    System.out.println("hash table: "+this.hTable);
 
     return accountID;
   }
@@ -117,20 +119,6 @@ public class EchoServer extends Thread {
 
 
   public void run () {
-    try
-    {
-        fileLog.write("add a line\n");//appends the string to the file
-        fileLog.close();
-    }
-    catch(IOException ioe)
-    {
-        System.err.println("IOException: " + ioe.getMessage());
-    }
-
-    
-
- 
-
     try {
 
 
@@ -148,61 +136,57 @@ public class EchoServer extends Thread {
       // String name = null;
     
       while((newReq = (Request) oin.readObject()) != null){
-        System.out.println(newReq.getType());
-        System.out.println(newReq);
-
         if(newReq.getType().equals("NewAccountRequest")){
           newReq = (NewAccountRequest)newReq;
-          System.out.println("NewAccount request made with name '"+newReq.getFirstName()+" "+newReq.getLastName()+"' and address '"
-            + newReq.getAddress()+"'.");
-
           int newAccountID =  makeNewAccount(newReq.getFirstName(), newReq.getLastName(), newReq.getAddress());
 
           //send back newAccountID
           oout.writeObject( new NewAccountResponse(newAccountID));
           oout.flush();
 
+          writeToLog("Request: NewAccount. First/Last/Address: "+newReq.getFirstName()+"/"+newReq.getLastName()+"/"+newReq.getAddress() +
+          ". Response: "+newAccountID);
 
 
 
         }else if(newReq.getType().equals("DepositRequest")){
           newReq = (DepositRequest)newReq;
-          System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
-
           String status = deposit(newReq.getAccountID(), newReq.getAmount());
 
           oout.writeObject( new DepositResponse(status));
           oout.flush();
 
+          writeToLog("Request: Deposit. AccountID/amount: "+newReq.getAccountID()+"/"+newReq.getAmount()+". Response: "+status);
+
         }else if(newReq.getType().equals("WithdrawRequest")){
           newReq = (WithdrawRequest)newReq;
-          System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
-
           String status = withdraw(newReq.getAccountID(), newReq.getAmount());
 
           oout.writeObject( new WithdrawResponse(status));
           oout.flush();
 
+          writeToLog("Request: Withdraw. AccountID/amount: "+newReq.getAccountID()+"/"+newReq.getAmount()+". Response: "+status);
+
         }else if(newReq.getType().equals("GetBalanceRequest")){
           newReq = (GetBalanceRequest)newReq;
-          System.out.println("Balance request made for account '" + newReq.getAccountID() + "'.");          
-
           int balance = getBalance(newReq.getAccountID());
 
           oout.writeObject( new GetBalanceResponse(balance));
           oout.flush();
 
+          writeToLog("Request: GetBalance. AccountID: "+newReq.getAccountID()+". Response: "+balance);
+
           //send back balance
 
         }else if(newReq.getType().equals("TransferRequest")){
           newReq = (TransferRequest)newReq;
-          System.out.println("Transfer request made from account '" + newReq.getAccountID() + "' to account '" + newReq.getTargetID() +
-            "' of amount '" + newReq.getAmount()+"'.");
-
           String status = transfer(newReq.getAccountID(), newReq.getTargetID(), newReq.getAmount());
 
           oout.writeObject( new TransferResponse(status));
           oout.flush();
+
+          writeToLog("Request: Transfer. AccountID/targetID/amount: "+newReq.getAccountID()+"/"+newReq.getTargetID()+"/"
+            +newReq.getAmount()+". Response: "+status);
 
         }
         else{
@@ -224,7 +208,6 @@ public class EchoServer extends Thread {
       try {
         s.close ();
         System.out.println ("Client exit.");
-        // System.out.println("Hash table: " + hTable);
       } catch (IOException ex) {
         ex.printStackTrace ();
       }
@@ -232,16 +215,13 @@ public class EchoServer extends Thread {
   }
 
   public static void main (String args[]) throws IOException {
-
-    //delete file log to start new one.
-
-    // Request req = new GetBalanceRequest(55);
-    // Response res = new GetBalanceResponse(10);
-    // System.out.println(req.getType());
-    // System.out.println(res.getType());
+    //delete log file each time the server is run
+    File f = new File("serverLogFile.txt");
+    f.delete();
 
 
     Hashtable<Integer, Account> newHt = new Hashtable<Integer, Account>();
+
 
     if (args.length != 1)
          throw new RuntimeException ("Syntax: EchoServer port-number");
@@ -253,6 +233,7 @@ public class EchoServer extends Thread {
       System.out.println ("Waiting for a client request");
       Socket client = server.accept ();
       System.out.println ("Received request from " + client.getInetAddress ());
+      
       EchoServer c = new EchoServer (client, newHt);
       c.start ();
     }

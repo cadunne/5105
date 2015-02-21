@@ -22,9 +22,6 @@ public class Client_B extends Thread  {
     this.port = port;
     this.aids = accounts;
     System.out.println ("New client.");
-    
-    
-
   } 
 
   public void run(){

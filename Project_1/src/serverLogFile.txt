@@ -1,0 +1,14 @@
+Request: NewAccount. First/Last/Address: John/Doe/333 Maple Road. Response: 1
+Request: NewAccount. First/Last/Address: Fred/Doe/111 Chestnut Street. Response: 2
+Request: Deposit. AccountID/amount: 1/100. Response: OK
+Request: Deposit. AccountID/amount: 2/100. Response: OK
+Request: GetBalance. AccountID: 1. Response: 100
+Request: GetBalance. AccountID: 2. Response: 100
+Request: Transfer. AccountID/targetID/amount: 1/2/100. Response: OK
+Request: GetBalance. AccountID: 1. Response: 0
+Request: GetBalance. AccountID: 2. Response: 200
+Request: Withdraw. AccountID/amount: 1/100. Response: FAIL
+Request: Withdraw. AccountID/amount: 2/100. Response: OK
+Request: Transfer. AccountID/targetID/amount: 1/2/100. Response: FAIL
+Request: GetBalance. AccountID: 1. Response: 0
+Request: GetBalance. AccountID: 2. Response: 100

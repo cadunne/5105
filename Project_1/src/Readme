@@ -1,0 +1,16 @@
+HOW TO COMPILE:
+
+Stay in the p1 directory (where the makefile and this readme reside)
+
+Run "make clean; make" to compile everything
+To run the server, simply run "java p1/EchoServer [port]"
+To run the clints, run one of the following:
+	"java p1/Client_A [hostname] [port]"
+	"java p1/Client_B [hostname] [port] [threadCount] [iterationCount]"
+
+
+
+Known bugs:
+-If you try to push up the iteration count too much, you will get some errors as the log file has been opened too many times
+	-Not sure why this happens, because I close the file whenever I write to it, and I also lock it w/ a basic mutex.
+

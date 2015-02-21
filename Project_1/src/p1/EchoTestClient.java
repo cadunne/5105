@@ -35,6 +35,12 @@ public class EchoTestClient   {
     ObjectOutputStream os = new ObjectOutputStream( out );
 
     os.writeObject( new NewAccountRequest("aaa", "lastname", "addr```"));
+    os.writeObject( new DepositRequest(1, 200));
+    os.writeObject( new WithdrawRequest(1, 100));
+    os.writeObject( new GetBalanceRequest(1));
+    os.writeObject( new TransferRequest(1, 2, 100));
+
+
     socket.close();
 
     /*

@@ -12,12 +12,12 @@ import p1.Account;
 public class EchoServer extends Thread {
   protected Socket s;
   protected FileWriter fileLog;
-  protected Hashtable<Integer, String> int_to_string; //change to store better data
+  protected Hashtable<Integer, Account> hTable; //change to store better data
 
-  EchoServer (Socket s, Hashtable<Integer, String> ht) {
+  EchoServer (Socket s, Hashtable<Integer, Account> ht) {
     System.out.println ("New client.");
     this.s = s;
-    this.int_to_string = ht;
+    this.hTable = ht;
     try{
       this.fileLog = new FileWriter("MyFile.txt", true);
     }
@@ -51,9 +51,36 @@ public class EchoServer extends Thread {
       // Date date = null;
       // String name = null;
       try {
-        newReq = (Request) oin.readObject();
-        System.out.println(newReq.getType());
-        System.out.println(newReq);
+        while((newReq = (Request) oin.readObject()) != null){
+          System.out.println(newReq.getType());
+          System.out.println(newReq);
+
+          if(newReq.getType().equals("NewAccountRequest")){
+            newReq = (NewAccountRequest)newReq;
+            Account acc = new Account(1, 0, newReq.getFirstName(), newReq.getLastName(), newReq.getAddress()); //fix accountID
+            this.hTable.put(1, acc);
+          }else if(newReq.getType().equals("DepositRequest")){
+            newReq = (DepositRequest)newReq;
+            System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
+
+          }else if(newReq.getType().equals("WithdrawRequest")){
+            newReq = (WithdrawRequest)newReq;
+            System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
+
+          }else if(newReq.getType().equals("GetBalanceRequest")){
+            newReq = (GetBalanceRequest)newReq;
+            System.out.println("Balance request made for account '" + newReq.getAccountID() + "'.");          
+
+          }else if(newReq.getType().equals("TransferRequest")){
+            newReq = (TransferRequest)newReq;
+            System.out.println("Transfer request made from account '" + newReq.getAccountID() + "' to account '" + newReq.getTargetID() +
+              "' of amount '" + newReq.getAmount()+"'.");
+
+          }
+          else{
+            System.out.println("Invalid request");//invalid request
+          }
+        }
 
          // date = (Date) oin.readObject();
          // name = (String) oin.readObject();
@@ -74,13 +101,13 @@ public class EchoServer extends Thread {
         String s = new String(buffer).replaceAll(" ","");
         System.out.println("new string got: " + s);
         // System.out.write (buffer, 0, read);
-        int_to_string.put(s.hashCode(), s);
+        hTable.put(s.hashCode(), s);
 
         // System.out.flush();
       }
-      System.out.println ("Client exit.");
-      System.out.println("Hash table: " + int_to_string);
-      */
+      System.out.println ("Client exit."); */
+      System.out.println("Hash table: " + hTable);
+
     } catch (IOException ex) {
       ex.printStackTrace ();
     } finally {
@@ -99,10 +126,7 @@ public class EchoServer extends Thread {
     Request req = new GetBalanceRequest(55);
     System.out.println(req.getType() + "\n");
 
-    Account acc = new Account(155, 0, "FN", "LN", "addrrrrr");
-    System.out.println(acc);
-
-    Hashtable<Integer, String> newHt = new Hashtable<Integer, String>();
+    Hashtable<Integer, Account> newHt = new Hashtable<Integer, Account>();
 
     if (args.length != 1)
          throw new RuntimeException ("Syntax: EchoServer port-number");

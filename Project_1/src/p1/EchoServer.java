@@ -6,13 +6,14 @@ import java.lang.Thread;
 import java.util.Hashtable;
 
 import p1.Request;
+import p1.Response;
 import p1.Account;
 
 
 public class EchoServer extends Thread {
   protected Socket s;
   protected FileWriter fileLog;
-  protected Hashtable<Integer, Account> hTable; //change to store better data
+  protected Hashtable<Integer, Account> hTable;
 
   EchoServer (Socket s, Hashtable<Integer, Account> ht) {
     System.out.println ("New client.");
@@ -26,6 +27,95 @@ public class EchoServer extends Thread {
     }
   } 
 
+
+  private int makeNewAccount(String firstName, String lastName, String address){
+    //sychronize on making new accountID
+    int accountID = this.hTable.size() + 1;
+
+    Account acc = new Account(accountID, 0, firstName, lastName, address); //fix accountID
+    this.hTable.put(accountID, acc);
+
+    System.out.println("hash table: "+this.hTable);
+
+    return accountID;
+  }
+
+  private String deposit(int accountID, int amount){
+    String status = ""; //OK or FAIL
+    if(amount < 0){
+      status = "FAIL";
+    }
+    else{
+      Account acc = this.hTable.get(accountID);
+      int bal = acc.getBalance();
+      bal += amount;
+      acc.setBalance(bal);
+      status = "OK";
+    }
+
+    return status;
+  }
+
+  private String withdraw(int accountID, int amount){
+    String status = ""; //OK or FAIL
+    if(amount < 0){
+      status = "FAIL";
+    }
+    else{
+      Account acc = this.hTable.get(accountID);
+      int bal = acc.getBalance();
+      if(bal - amount <= 0){
+        status = "FAIL";        
+      }
+      else{
+        bal -= amount;
+        acc.setBalance(bal);
+        status = "OK";
+      }
+    }
+
+    return status;
+  }
+
+  private int getBalance(int accountID){
+    int balance = 0;
+
+    Account acc = this.hTable.get(accountID);
+    balance = acc.getBalance();
+
+    return balance;
+  }
+
+  private String transfer(int accountID, int targetID, int amount){
+    String status = ""; //OK or FAIL
+
+    if(amount < 0){
+      status = "FAIL";
+    }
+    else{
+      Account acc = this.hTable.get(accountID);
+      Account tar = this.hTable.get(targetID);
+      int aBal = acc.getBalance();
+      int tBal = tar.getBalance();
+
+      if(aBal - amount <= 0){
+        status = "FAIL";
+      }
+      else{
+        aBal -= amount;
+        tBal += amount;
+        acc.setBalance(aBal);
+        tar.setBalance(tBal);
+        status = "OK";
+      }
+    }
+
+    return status;
+  }
+
+
+
+
   public void run () {
     try
     {
@@ -37,12 +127,21 @@ public class EchoServer extends Thread {
         System.err.println("IOException: " + ioe.getMessage());
     }
 
+    
+
  
 
     try {
+
+
       InputStream istream = s.getInputStream ();
-      ObjectInputStream oin = new ObjectInputStream (istream); //NEW
+      ObjectInputStream oin = new ObjectInputStream (istream);
       OutputStream ostream = s.getOutputStream ();
+      ObjectOutputStream oout = new ObjectOutputStream(ostream);
+
+      oout.writeObject( new NewAccountResponse(1));
+    oout.flush();
+
       PrintWriter outp = new PrintWriter (ostream, true);
       outp.println ("Welcome to the multithreaded echo server."); //not being written right away
 
@@ -57,24 +156,50 @@ public class EchoServer extends Thread {
 
           if(newReq.getType().equals("NewAccountRequest")){
             newReq = (NewAccountRequest)newReq;
-            Account acc = new Account(1, 0, newReq.getFirstName(), newReq.getLastName(), newReq.getAddress()); //fix accountID
-            this.hTable.put(1, acc);
+            System.out.println("NewAccount request made with name '"+newReq.getFirstName()+" "+newReq.getLastName()+"' and address '"
+              + newReq.getAddress()+"'.");
+
+            int newAccountID =  makeNewAccount(newReq.getFirstName(), newReq.getLastName(), newReq.getAddress());
+
+            //send back newAccountID
+            oout.writeObject( new NewAccountResponse(newAccountID));
+            oout.flush();
+
+
+
+
           }else if(newReq.getType().equals("DepositRequest")){
             newReq = (DepositRequest)newReq;
             System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
+
+            String status = deposit(newReq.getAccountID(), newReq.getAmount());
+
+            //send back status
 
           }else if(newReq.getType().equals("WithdrawRequest")){
             newReq = (WithdrawRequest)newReq;
             System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
 
+            String status = withdraw(newReq.getAccountID(), newReq.getAmount());
+
+            //send back status
+
           }else if(newReq.getType().equals("GetBalanceRequest")){
             newReq = (GetBalanceRequest)newReq;
             System.out.println("Balance request made for account '" + newReq.getAccountID() + "'.");          
+
+            int balance = getBalance(newReq.getAccountID());
+
+            //send back balance
 
           }else if(newReq.getType().equals("TransferRequest")){
             newReq = (TransferRequest)newReq;
             System.out.println("Transfer request made from account '" + newReq.getAccountID() + "' to account '" + newReq.getTargetID() +
               "' of amount '" + newReq.getAmount()+"'.");
+
+            String status = transfer(newReq.getAccountID(), newReq.getTargetID(), newReq.getAmount());
+
+            //send back status
 
           }
           else{
@@ -88,6 +213,11 @@ public class EchoServer extends Thread {
       catch ( ClassNotFoundException e) {
          e.printStackTrace();
       }
+      catch (EOFException e) {
+        //end of file, simply continue on
+      }
+
+
 
       // System.out.println( "Name: "+  name+  ", Date: "+ date );
 
@@ -123,8 +253,11 @@ public class EchoServer extends Thread {
 
     //delete file log to start new one.
 
-    Request req = new GetBalanceRequest(55);
-    System.out.println(req.getType() + "\n");
+    // Request req = new GetBalanceRequest(55);
+    // Response res = new GetBalanceResponse(10);
+    // System.out.println(req.getType());
+    // System.out.println(res.getType());
+
 
     Hashtable<Integer, Account> newHt = new Hashtable<Integer, Account>();
 

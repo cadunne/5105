@@ -3,6 +3,10 @@ package p1;
 import java.net.*;
 import java.io.*;
 
+import p1.Request;
+import p1.Response;
+import p1.Account;
+
 public class EchoTestClient   {
 
   protected String host, file;
@@ -32,13 +36,37 @@ public class EchoTestClient   {
 
 
     OutputStream out = socket.getOutputStream ();
-    ObjectOutputStream os = new ObjectOutputStream( out );
+    ObjectOutputStream ous = new ObjectOutputStream( out );
+    InputStream in = socket.getInputStream ();
+    ObjectInputStream ins = new ObjectInputStream (in);
+    
+    ous.writeObject( new NewAccountRequest("John", "Doe", "333 Maple Road"));
+    // ous.writeObject( new DepositRequest(1, 200));
+    // ous.writeObject( new NewAccountRequest("John2", "Doe2", "333 Maple Road2"));
+    // ous.writeObject( new WithdrawRequest(1, 100));
+    // ous.writeObject( new GetBalanceRequest(1));
+    // ous.writeObject( new TransferRequest(1, 2, 100));
 
-    os.writeObject( new NewAccountRequest("aaa", "lastname", "addr```"));
-    os.writeObject( new DepositRequest(1, 200));
-    os.writeObject( new WithdrawRequest(1, 100));
-    os.writeObject( new GetBalanceRequest(1));
-    os.writeObject( new TransferRequest(1, 2, 100));
+
+
+
+    try{
+        Thread.sleep(1000);
+    } catch (InterruptedException e){
+        e.printStackTrace();
+    }
+    try {
+        Response newRes = (Response) ins.readObject();
+
+        System.out.println(newRes.getType());
+    }
+    catch ( ClassNotFoundException e) {
+         e.printStackTrace();
+    }
+
+
+
+
 
 
     socket.close();

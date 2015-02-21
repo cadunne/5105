@@ -97,18 +97,22 @@ public class EchoServer extends Thread {
       Account tar = this.hTable.get(targetID);
       int aBal = acc.getBalance();
       int tBal = tar.getBalance();
+      System.out.println("@@@@@@@@@ "+tBal);
 
-      if(aBal - amount <= 0){
+      if(aBal - amount < 0){
         status = "FAIL";
       }
       else{
         aBal -= amount;
         tBal += amount;
         acc.setBalance(aBal);
+
         tar.setBalance(tBal);
         status = "OK";
       }
     }
+    
+    System.out.println("@@@@@@@@@ "+this.hTable.get(targetID).getBalance());
 
     return status;
   }
@@ -139,110 +143,94 @@ public class EchoServer extends Thread {
       OutputStream ostream = s.getOutputStream ();
       ObjectOutputStream oout = new ObjectOutputStream(ostream);
 
-      oout.writeObject( new NewAccountResponse(1));
-    oout.flush();
-
-      PrintWriter outp = new PrintWriter (ostream, true);
-      outp.println ("Welcome to the multithreaded echo server."); //not being written right away
+      // PrintWriter outp = new PrintWriter (ostream, true);
+      // outp.println ("Welcome to the multithreaded echo server."); //not being written right away
 
       Request newReq = null;
 
       // Date date = null;
       // String name = null;
-      try {
-        while((newReq = (Request) oin.readObject()) != null){
-          System.out.println(newReq.getType());
-          System.out.println(newReq);
+    
+      while((newReq = (Request) oin.readObject()) != null){
+        System.out.println(newReq.getType());
+        System.out.println(newReq);
 
-          if(newReq.getType().equals("NewAccountRequest")){
-            newReq = (NewAccountRequest)newReq;
-            System.out.println("NewAccount request made with name '"+newReq.getFirstName()+" "+newReq.getLastName()+"' and address '"
-              + newReq.getAddress()+"'.");
+        if(newReq.getType().equals("NewAccountRequest")){
+          newReq = (NewAccountRequest)newReq;
+          System.out.println("NewAccount request made with name '"+newReq.getFirstName()+" "+newReq.getLastName()+"' and address '"
+            + newReq.getAddress()+"'.");
 
-            int newAccountID =  makeNewAccount(newReq.getFirstName(), newReq.getLastName(), newReq.getAddress());
+          int newAccountID =  makeNewAccount(newReq.getFirstName(), newReq.getLastName(), newReq.getAddress());
 
-            //send back newAccountID
-            oout.writeObject( new NewAccountResponse(newAccountID));
-            oout.flush();
-
-
+          //send back newAccountID
+          oout.writeObject( new NewAccountResponse(newAccountID));
+          oout.flush();
 
 
-          }else if(newReq.getType().equals("DepositRequest")){
-            newReq = (DepositRequest)newReq;
-            System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
 
-            String status = deposit(newReq.getAccountID(), newReq.getAmount());
 
-            //send back status
+        }else if(newReq.getType().equals("DepositRequest")){
+          newReq = (DepositRequest)newReq;
+          System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
 
-          }else if(newReq.getType().equals("WithdrawRequest")){
-            newReq = (WithdrawRequest)newReq;
-            System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
+          String status = deposit(newReq.getAccountID(), newReq.getAmount());
 
-            String status = withdraw(newReq.getAccountID(), newReq.getAmount());
+          oout.writeObject( new DepositResponse(status));
+          oout.flush();
 
-            //send back status
+        }else if(newReq.getType().equals("WithdrawRequest")){
+          newReq = (WithdrawRequest)newReq;
+          System.out.println("Deposit request made for account '" + newReq.getAccountID() + "' of amount '" + newReq.getAmount()+"'.");
 
-          }else if(newReq.getType().equals("GetBalanceRequest")){
-            newReq = (GetBalanceRequest)newReq;
-            System.out.println("Balance request made for account '" + newReq.getAccountID() + "'.");          
+          String status = withdraw(newReq.getAccountID(), newReq.getAmount());
 
-            int balance = getBalance(newReq.getAccountID());
+          oout.writeObject( new WithdrawResponse(status));
+          oout.flush();
 
-            //send back balance
+        }else if(newReq.getType().equals("GetBalanceRequest")){
+          newReq = (GetBalanceRequest)newReq;
+          System.out.println("Balance request made for account '" + newReq.getAccountID() + "'.");          
 
-          }else if(newReq.getType().equals("TransferRequest")){
-            newReq = (TransferRequest)newReq;
-            System.out.println("Transfer request made from account '" + newReq.getAccountID() + "' to account '" + newReq.getTargetID() +
-              "' of amount '" + newReq.getAmount()+"'.");
+          int balance = getBalance(newReq.getAccountID());
+              System.out.println("@@@@@@@@@ "+this.hTable.get(newReq.getAccountID()).getBalance());
 
-            String status = transfer(newReq.getAccountID(), newReq.getTargetID(), newReq.getAmount());
 
-            //send back status
+          oout.writeObject( new GetBalanceResponse(balance));
+          oout.flush();
 
-          }
-          else{
-            System.out.println("Invalid request");//invalid request
-          }
+          //send back balance
+
+        }else if(newReq.getType().equals("TransferRequest")){
+          newReq = (TransferRequest)newReq;
+          System.out.println("Transfer request made from account '" + newReq.getAccountID() + "' to account '" + newReq.getTargetID() +
+            "' of amount '" + newReq.getAmount()+"'.");
+
+          String status = transfer(newReq.getAccountID(), newReq.getTargetID(), newReq.getAmount());
+
+          oout.writeObject( new TransferResponse(status));
+          oout.flush();
+
         }
-
-         // date = (Date) oin.readObject();
-         // name = (String) oin.readObject();
+        else{
+          System.out.println("Invalid request");//invalid request
+        }
       }
-      catch ( ClassNotFoundException e) {
-         e.printStackTrace();
-      }
-      catch (EOFException e) {
-        //end of file, simply continue on
-      }
+    }
+    catch ( ClassNotFoundException e) {
+       e.printStackTrace();
+    }
+    catch (EOFException e) {
+      //end of file, simply continue on
+    }
+      
 
-
-
-      // System.out.println( "Name: "+  name+  ", Date: "+ date );
-
-
-      /*
-      byte buffer[] = new byte[16];
-      int read;
-      while ((read = istream.read (buffer)) >= 0) {
-        ostream.write (buffer, 0, read);
-
-        String s = new String(buffer).replaceAll(" ","");
-        System.out.println("new string got: " + s);
-        // System.out.write (buffer, 0, read);
-        hTable.put(s.hashCode(), s);
-
-        // System.out.flush();
-      }
-      System.out.println ("Client exit."); */
-      System.out.println("Hash table: " + hTable);
-
-    } catch (IOException ex) {
+    catch (IOException ex) {
       ex.printStackTrace ();
     } finally {
       try {
         s.close ();
+        System.out.println ("Client exit.");
+        System.out.println("Hash table: " + hTable);
       } catch (IOException ex) {
         ex.printStackTrace ();
       }

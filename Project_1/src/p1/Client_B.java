@@ -24,6 +24,17 @@ public class Client_B extends Thread  {
     System.out.println ("New client.");
   } 
 
+  private synchronized void writeToLog(String contents){
+    try{
+        FileWriter fw = new FileWriter("clientLogFile.txt", true);
+        fw.write(contents + "\n");
+        fw.flush();
+      }
+      catch(IOException e){
+        e.printStackTrace();
+      }
+  }
+
   public void run(){
 
     System.out.println ("Connecting to " + host + ":" + port + "..");
@@ -61,7 +72,9 @@ public class Client_B extends Thread  {
             ous.writeObject( new TransferRequest (aid_1, aid_2, 10));   
             Response newRes1 = (Response) ins.readObject();
             String status1 = newRes1.getStatus();
-            System.out.println(status1);
+            if(status1.equals("FAIL")){
+                writeToLog("FAIL return status when transferring between accounts "+aid_1+" and "+aid_2+".");
+            }
         }
         catch ( ClassNotFoundException e) {
              e.printStackTrace();
@@ -86,6 +99,12 @@ public class Client_B extends Thread  {
     Socket      sock = null;
     String host = args[0];
     int  port = Integer.parseInt( args[1] );
+
+    //make sure log is made
+    FileWriter fw = new FileWriter("clientLogFile.txt", true);
+    fw.write("");
+    fw.close();
+
 
     if ( args.length != 2 ) {
        throw new RuntimeException( "hostname and port number as arguments" );

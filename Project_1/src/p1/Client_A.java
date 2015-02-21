@@ -34,12 +34,13 @@ public class Client_A   {
 
 
 
-
+    //set up streams
     OutputStream out = socket.getOutputStream ();
     ObjectOutputStream ous = new ObjectOutputStream( out );
     InputStream in = socket.getInputStream ();
     ObjectInputStream ins = new ObjectInputStream (in);
 
+    //make 2 accounts
     ous.writeObject( new NewAccountRequest("John", "Doe", "333 Maple Road"));
     ous.writeObject( new NewAccountRequest("Fred", "Doe", "111 Chestnut Street"));
 
@@ -47,6 +48,7 @@ public class Client_A   {
     String status1, status2;
     Response newRes1, newRes2;
 
+    //get accountIDs back;keep track of them
     try {
         newRes1= (Response) ins.readObject();
         newRes2 = (Response) ins.readObject();
@@ -65,69 +67,52 @@ public class Client_A   {
         newRes2 = (Response) ins.readObject();
         status1 = newRes1.getStatus();
         status2 = newRes2.getStatus();
-        System.out.println(status1+status2);
+        System.out.println("Statuses: "+status1+ " " +status2);
     }
     catch ( ClassNotFoundException e) {
          e.printStackTrace();
     }
 
-    // ous.writeObject( new NewAccountRequest("John2", "Doe2", "333 Maple Road2"));
-    // ous.writeObject( new WithdrawRequest(1, 100));
+    //get account balances
     ous.writeObject( new GetBalanceRequest(aid_1));
     ous.writeObject( new GetBalanceRequest(aid_2));
-    // ous.writeObject( new TransferRequest(1, 2, 100));
     try {
         newRes1 = (Response) ins.readObject();
         newRes2 = (Response) ins.readObject();
         bal1 = newRes1.getBalance();
         bal2 = newRes2.getBalance();
-        System.out.println(bal1+ " " + bal2);
+        System.out.println("Balances: "+bal1+ " " + bal2);
     }
     catch ( ClassNotFoundException e) {
          e.printStackTrace();
     }
-
-
 
     //transfer, read
     ous.writeObject( new TransferRequest (aid_1, aid_2, 100));
     try {
         newRes1 = (Response) ins.readObject();
         status1 = newRes1.getStatus();
-        System.out.println(status1);
+        System.out.println("Status of first transfer attempt: "+status1);
     }
     catch ( ClassNotFoundException e) {
          e.printStackTrace();
     }
 
-
-    // try{
-    //     Thread.sleep(1000);
-    // } catch (InterruptedException e){
-    //     e.printStackTrace();
-    // }
-    
-
+    //get balances again
     ous.writeObject( new GetBalanceRequest(aid_1));
     ous.writeObject( new GetBalanceRequest(aid_2));
-    // ous.writeObject( new TransferRequest(1, 2, 100));
     try {
         newRes1 = (Response) ins.readObject();
         newRes2 = (Response) ins.readObject();
         bal1 = newRes1.getBalance();
         bal2 = newRes2.getBalance();
-        System.out.println(bal1+ " " + bal2);
+        System.out.println("Balances again: "+bal1+ " " + bal2);
     }
     catch ( ClassNotFoundException e) {
          e.printStackTrace();
     }
 
-/*
-7. Repeat step 4 above (transfer operation); it should return fail status
-8. Repeat step 3 above, and print the returned status and values
-*/
-    
-
+    //attempt to Withdraw 100s
     ous.writeObject( new WithdrawRequest(aid_1, 100));
     ous.writeObject( new WithdrawRequest(aid_2, 100));
     try {
@@ -135,60 +120,36 @@ public class Client_A   {
         newRes2 = (Response) ins.readObject();
         status1 = newRes1.getStatus();
         status2 = newRes2.getStatus();
-        System.out.println(status1+status2);
+        System.out.println("Post-withdraw statuses: "+status1+ " " +status2);
     }
     catch ( ClassNotFoundException e) {
          e.printStackTrace();
     }
 
-
+    //attempt to transfer again
     ous.writeObject( new TransferRequest (aid_1, aid_2, 100));
     try {
         newRes1 = (Response) ins.readObject();
         status1 = newRes1.getStatus();
-        System.out.println(status1);
+        System.out.println("Status after second transfer: "+status1);
     }
     catch ( ClassNotFoundException e) {
          e.printStackTrace();
     }
 
-
+    //get balances
     ous.writeObject( new GetBalanceRequest(aid_1));
     ous.writeObject( new GetBalanceRequest(aid_2));
-    // ous.writeObject( new TransferRequest(1, 2, 100));
     try {
         newRes1 = (Response) ins.readObject();
         newRes2 = (Response) ins.readObject();
         bal1 = newRes1.getBalance();
         bal2 = newRes2.getBalance();
-        System.out.println(bal1+ " " + bal2);
+        System.out.println("Final balances: "+bal1+ " " + bal2);
     }
     catch ( ClassNotFoundException e) {
          e.printStackTrace();
     }
-
-    // socket.close();
-
-    /*
-
-    OutputStream rawOut = socket.getOutputStream ();
-    InputStream rawIn = socket.getInputStream ();
-    BufferedReader  buffreader = new BufferedReader( new InputStreamReader(rawIn) );
-    PrintWriter printer = new PrintWriter(new OutputStreamWriter(rawOut));
-
-    BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
-
-    String line1, line2 ;
-//    while ( ( line = keyboard.readLine() ) != null ) {
-
-
-    while ( (line1 = keyboard.readLine()) != null) {
-            printer.println(line1);
-            printer.flush();
-            System.out.println("echo: " + buffreader.readLine());
-    }
-    */
-
 
   }
 }

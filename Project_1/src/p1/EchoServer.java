@@ -28,8 +28,7 @@ public class EchoServer extends Thread {
   } 
 
 
-  private int makeNewAccount(String firstName, String lastName, String address){
-    //sychronize on making new accountID
+  private synchronized int makeNewAccount(String firstName, String lastName, String address){
     int accountID = this.hTable.size() + 1;
 
     Account acc = new Account(accountID, 0, firstName, lastName, address); //fix accountID
@@ -86,7 +85,7 @@ public class EchoServer extends Thread {
     return balance;
   }
 
-  private String transfer(int accountID, int targetID, int amount){
+  private synchronized String transfer(int accountID, int targetID, int amount){
     String status = ""; //OK or FAIL
 
     if(amount < 0){
@@ -97,7 +96,6 @@ public class EchoServer extends Thread {
       Account tar = this.hTable.get(targetID);
       int aBal = acc.getBalance();
       int tBal = tar.getBalance();
-      System.out.println("@@@@@@@@@ "+tBal);
 
       if(aBal - amount < 0){
         status = "FAIL";
@@ -112,8 +110,6 @@ public class EchoServer extends Thread {
       }
     }
     
-    System.out.println("@@@@@@@@@ "+this.hTable.get(targetID).getBalance());
-
     return status;
   }
 
@@ -192,8 +188,6 @@ public class EchoServer extends Thread {
           System.out.println("Balance request made for account '" + newReq.getAccountID() + "'.");          
 
           int balance = getBalance(newReq.getAccountID());
-              System.out.println("@@@@@@@@@ "+this.hTable.get(newReq.getAccountID()).getBalance());
-
 
           oout.writeObject( new GetBalanceResponse(balance));
           oout.flush();
@@ -230,7 +224,7 @@ public class EchoServer extends Thread {
       try {
         s.close ();
         System.out.println ("Client exit.");
-        System.out.println("Hash table: " + hTable);
+        // System.out.println("Hash table: " + hTable);
       } catch (IOException ex) {
         ex.printStackTrace ();
       }

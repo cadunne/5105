@@ -1,4 +1,4 @@
-package p1;
+package p2;
 
 public class Account{
 	private int accountID, balance;

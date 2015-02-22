@@ -9,4 +9,10 @@ server:
 
 client:
 	java p1/Client_B localhost 5113
+
+clientt:
+	java p2/Client_A localhost:1111
 	
+
+p2:
+	javac p2/RMI_Interface.java p2/RMI_Server.java p2/Client_A.java

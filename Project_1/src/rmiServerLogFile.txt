@@ -4,3 +4,55 @@ Request: NewAccount. First/Last/Address: FF/LL/----. Response: 10
 Request: NewAccount. First/Last/Address: FF/LL/----. Response: 1
 Request: NewAccount. First/Last/Address: FF/LL/----. Response: 2
 Request: NewAccount. First/Last/Address: FF/LL/----. Response: 3
+Request: NewAccount. First/Last/Address: FF/LL/----. Response: 1
+Request: NewAccount. First/Last/Address: FF/LL/----. Response: 1
+Request: NewAccount. First/Last/Address: Jason/Lolly/112 Test Addr. Response: 2
+Request: NewAccount. First/Last/Address: Chris/Spurbs/321 Real Addr. Response: 3
+Request: Deposit. AccountID/amount: 2/100. Response: OK
+Request: Deposit. AccountID/amount: 3/100. Response: OK
+Request: GetBalance. AccountID: 2. Response: 100
+Request: GetBalance. AccountID: 3. Response: 100
+Request: Transfer. AccountID/targetID/amount: 2/3/100. Response: OK
+Request: GetBalance. AccountID: 2. Response: 0
+Request: GetBalance. AccountID: 3. Response: 200
+Request: Transfer. AccountID/targetID/amount: 2/3/100. Response: FAIL
+Request: GetBalance. AccountID: 2. Response: 0
+Request: GetBalance. AccountID: 3. Response: 200
+Request: NewAccount. First/Last/Address: Jason/Lolly/112 Test Addr. Response: 1
+Request: NewAccount. First/Last/Address: Chris/Spurbs/321 Real Addr. Response: 2
+Request: Deposit. AccountID/amount: 1/100. Response: OK
+Request: Deposit. AccountID/amount: 2/100. Response: OK
+Request: GetBalance. AccountID: 1. Response: 100
+Request: GetBalance. AccountID: 2. Response: 100
+Request: Transfer. AccountID/targetID/amount: 1/2/100. Response: OK
+Request: GetBalance. AccountID: 1. Response: 0
+Request: GetBalance. AccountID: 2. Response: 200
+Request: Transfer. AccountID/targetID/amount: 1/2/100. Response: FAIL
+Request: GetBalance. AccountID: 1. Response: 0
+Request: GetBalance. AccountID: 2. Response: 200
+Request: NewAccount. First/Last/Address: Jason/Lolly/112 Test Addr. Response: 1
+Request: NewAccount. First/Last/Address: Chris/Spurbs/321 Real Addr. Response: 2
+Request: Deposit. AccountID/amount: 1/100. Response: OK
+Request: Deposit. AccountID/amount: 2/100. Response: OK
+Request: GetBalance. AccountID: 1. Response: 100
+Request: GetBalance. AccountID: 2. Response: 100
+Request: Transfer. AccountID/targetID/amount: 1/2/100. Response: OK
+Request: GetBalance. AccountID: 1. Response: 0
+Request: GetBalance. AccountID: 2. Response: 200
+Request: Transfer. AccountID/targetID/amount: 1/2/100. Response: FAIL
+Request: GetBalance. AccountID: 1. Response: 0
+Request: GetBalance. AccountID: 2. Response: 200
+Request: NewAccount. First/Last/Address: Jason/Lolly/112 Test Addr. Response: 1
+Request: NewAccount. First/Last/Address: Chris/Spurbs/321 Real Addr. Response: 2
+Request: Deposit. AccountID/amount: 1/100. Response: OK
+Request: Deposit. AccountID/amount: 2/100. Response: OK
+Request: GetBalance. AccountID: 1. Response: 100
+Request: GetBalance. AccountID: 2. Response: 100
+Request: Transfer. AccountID/targetID/amount: 1/2/100. Response: OK
+Request: GetBalance. AccountID: 1. Response: 0
+Request: GetBalance. AccountID: 2. Response: 200
+Request: Withdraw. AccountID/amount: 1/100. Response: FAIL
+Request: Withdraw. AccountID/amount: 2/100. Response: OK
+Request: Transfer. AccountID/targetID/amount: 1/2/100. Response: FAIL
+Request: GetBalance. AccountID: 1. Response: 0
+Request: GetBalance. AccountID: 2. Response: 100

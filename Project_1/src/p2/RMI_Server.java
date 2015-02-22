@@ -72,7 +72,18 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
   }
 
   public String deposit(int accountID, int amount){
-    String status="";
+    String status = ""; //OK or FAIL
+    if(amount < 0){
+      status = "FAIL";
+    }
+    else{
+      Account acc = this.hTable.get(accountID);
+      int bal = acc.getBalance();
+      bal += amount;
+      acc.setBalance(bal);
+      status = "OK";
+    }
+
 
     writeToLog("Request: Deposit. AccountID/amount: "+accountID+"/"+amount+". Response: "+status);
 
@@ -82,7 +93,22 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
   }
 
   public String withdraw(int accountID, int amount){
-    String status="";
+    String status = ""; //OK or FAIL
+    if(amount < 0){
+      status = "FAIL";
+    }
+    else{
+      Account acc = this.hTable.get(accountID);
+      int bal = acc.getBalance();
+      if(bal - amount <= 0){
+        status = "FAIL";        
+      }
+      else{
+        bal -= amount;
+        acc.setBalance(bal);
+        status = "OK";
+      }
+    }
     
     writeToLog("Request: Withdraw. AccountID/amount: "+accountID+"/"+amount+". Response: "+status);
 
@@ -92,6 +118,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
   public int getBalance(int accountID){
     int amount = 0;
+
+    Account acc = this.hTable.get(accountID);
+    amount = acc.getBalance();
     
     writeToLog("Request: GetBalance. AccountID: "+accountID+". Response: "+amount);
 
@@ -99,8 +128,31 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
   }
   public String transfer(int accountID, int targetID, int amount){
     synchronized(this){
+      String status = ""; //OK or FAIL
 
-      String status="";
+      if(amount < 0){
+        status = "FAIL";
+      }
+      else{
+        Account acc = this.hTable.get(accountID);
+        Account tar = this.hTable.get(targetID);
+        int aBal = acc.getBalance();
+        int tBal = tar.getBalance();
+
+        if(aBal - amount < 0){
+          status = "FAIL";
+        }
+        else{
+          aBal -= amount;
+          tBal += amount;
+          System.out.println("bals: "+aBal+" "+tBal);
+          acc.setBalance(aBal);
+          tar.setBalance(tBal);
+
+          status = "OK";
+        }
+      }
+
       writeToLog("Request: Transfer. AccountID/targetID/amount: "+accountID+"/"+targetID+"/"+amount+". Response: "+status);
       return status;
 

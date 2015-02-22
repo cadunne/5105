@@ -13,7 +13,7 @@ public class Account{
     }
 
     public String toString() { 
-	    return "Account info: " + this.accountID + this.balance + this.firstName + this.lastName + this.address + "\n";
+	    return "Account info: " + this.accountID + "" + this.balance + this.firstName + this.lastName + this.address + "\n";
 	}
 
     public int getAccountID(){

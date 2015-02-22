@@ -2,7 +2,6 @@ package p2;
 
 import java.rmi.RMISecurityManager;
 import java.rmi.Naming;
-import java.util.Date;
 
 import p2.RMI_Server;
 
@@ -18,11 +17,6 @@ public class Client_A {
       throw new RuntimeException ("Syntax: DateClient <hostname>");
     System.setSecurityManager (new RMISecurityManager ());
     RMI_Interface rmiS = (RMI_Interface) Naming.lookup ("//" + args[0] + "/RMI_Server");
-
-
-
-
-
 
     //init vars
     int aid_1, aid_2, bal1, bal2;

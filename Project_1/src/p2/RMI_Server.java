@@ -65,7 +65,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
       writeToLog("Request: NewAccount. First/Last/Address: "+firstName+"/"+lastName+"/"+address +". Response: "+accountID);
 
-      System.out.println(this.hTable);
+      // System.out.println(this.hTable);
 
       return accountID;
     }
@@ -145,7 +145,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         else{
           aBal -= amount;
           tBal += amount;
-          System.out.println("bals: "+aBal+" "+tBal);
           acc.setBalance(aBal);
           tar.setBalance(tBal);
 

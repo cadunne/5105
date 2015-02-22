@@ -15,4 +15,4 @@ clientt:
 	
 
 p2:
-	javac p2/RMI_Interface.java p2/RMI_Server.java p2/Client_A.java
+	javac p2/RMI_Interface.java p2/RMI_Server.java p2/Client_A.java p2/Client_B.java

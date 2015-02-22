@@ -40,8 +40,9 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
   protected Hashtable<Integer, Account> hTable;
 
-  public RMI_Server () throws RemoteException {
+  public RMI_Server (Hashtable<Integer, Account> hTable) throws RemoteException {
      super( 5051 );
+     this.hTable = hTable;
   }
 
 
@@ -58,9 +59,14 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
   public int makeNewAccount(String firstName, String lastName, String address){
     synchronized(this){
+      int accountID = this.hTable.size() + 1;
+      Account acc = new Account(accountID, 0, firstName, lastName, address);
+      this.hTable.put(accountID, acc);
 
-      int accountID = 10;
       writeToLog("Request: NewAccount. First/Last/Address: "+firstName+"/"+lastName+"/"+address +". Response: "+accountID);
+
+      System.out.println(this.hTable);
+
       return accountID;
     }
   }
@@ -104,8 +110,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
   public static void main (String args[]) throws Exception {
 
     System.setSecurityManager (new RMISecurityManager ());
+    Hashtable<Integer, Account> newHt = new Hashtable<Integer, Account>();
 
-    RMI_Server rmiS = new RMI_Server ();
+
+    RMI_Server rmiS = new RMI_Server (newHt);
 
     if ( args.length == 0 ) {
       // If no port number is given for the rmiregistry, assume it is on the default port 1099

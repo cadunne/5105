@@ -1,3 +1,6 @@
 Request: NewAccount. First/Last/Address: FF/LL/----. Response: 10
 Request: NewAccount. First/Last/Address: FF/LL/----. Response: 10
 Request: NewAccount. First/Last/Address: FF/LL/----. Response: 10
+Request: NewAccount. First/Last/Address: FF/LL/----. Response: 1
+Request: NewAccount. First/Last/Address: FF/LL/----. Response: 2
+Request: NewAccount. First/Last/Address: FF/LL/----. Response: 3

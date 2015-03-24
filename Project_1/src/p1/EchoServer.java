@@ -1,3 +1,10 @@
+/* CSci5105 Spring 2015
+* Assignment# 2
+* name: Connor Dunne
+* student id: 4781173
+* x500 id: dunne064
+* CSELABS machine: kh1262-11
+*/
 package p1;
 
 import java.net.*;
@@ -20,6 +27,7 @@ public class EchoServer extends Thread {
     this.hTable = ht;
   } 
 
+  //When called, writes to log
   private synchronized void writeToLog(String contents){
     try{
         FileWriter fw = new FileWriter("serverLogFile.txt", true);
@@ -31,7 +39,7 @@ public class EchoServer extends Thread {
       }
   }
 
-
+  //Sychronized so that no two accounts have the same ID
   private synchronized int makeNewAccount(String firstName, String lastName, String address){
     int accountID = this.hTable.size() + 1;
 
@@ -87,6 +95,7 @@ public class EchoServer extends Thread {
     return balance;
   }
 
+  //Synchronized so tansfers don't mess up the hash table when done concurrently
   private synchronized String transfer(int accountID, int targetID, int amount){
     String status = ""; //OK or FAIL
 
@@ -106,7 +115,6 @@ public class EchoServer extends Thread {
         aBal -= amount;
         tBal += amount;
         acc.setBalance(aBal);
-
         tar.setBalance(tBal);
         status = "OK";
       }
@@ -127,14 +135,10 @@ public class EchoServer extends Thread {
       OutputStream ostream = s.getOutputStream ();
       ObjectOutputStream oout = new ObjectOutputStream(ostream);
 
-      // PrintWriter outp = new PrintWriter (ostream, true);
-      // outp.println ("Welcome to the multithreaded echo server."); //not being written right away
-
       Request newReq = null;
-
-      // Date date = null;
-      // String name = null;
     
+      //Structure of requests (below): get the new request; complete it (call helper methods above); send back response, log request.
+
       while((newReq = (Request) oin.readObject()) != null){
         if(newReq.getType().equals("NewAccountRequest")){
           newReq = (NewAccountRequest)newReq;
@@ -146,8 +150,6 @@ public class EchoServer extends Thread {
 
           writeToLog("Request: NewAccount. First/Last/Address: "+newReq.getFirstName()+"/"+newReq.getLastName()+"/"+newReq.getAddress() +
           ". Response: "+newAccountID);
-
-
 
         }else if(newReq.getType().equals("DepositRequest")){
           newReq = (DepositRequest)newReq;
@@ -199,19 +201,16 @@ public class EchoServer extends Thread {
     }
     catch (EOFException e) {
       //end of file, simply continue on
-    }
-      
-
-    catch (IOException ex) {
+    } catch (IOException ex) {
       ex.printStackTrace ();
     } finally {
       try {
         s.close ();
-        System.out.println ("Client exit.");
       } catch (IOException ex) {
         ex.printStackTrace ();
       }
     }
+    //end of thread
   }
 
   public static void main (String args[]) throws IOException {
@@ -229,6 +228,7 @@ public class EchoServer extends Thread {
     System.out.println ("Starting on port " + args[0]);
     ServerSocket server = new ServerSocket (Integer.parseInt (args[0]));
 
+    //spawn threads/sockets on incomming requests
     while (true) {
       System.out.println ("Waiting for a client request");
       Socket client = server.accept ();

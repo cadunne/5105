@@ -1,5 +1,6 @@
 package p1;
 
+//Abstract
 public class Request implements java.io.Serializable{
     public String type;
 

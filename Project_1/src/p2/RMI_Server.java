@@ -1,7 +1,13 @@
+/* CSci5105 Spring 2015
+* Assignment# 2
+* name: Connor Dunne
+* student id: 4781173
+* x500 id: dunne064
+* CSELABS machine: kh1262-11
+*/
 package p2;
 
 import java.rmi.server.UnicastRemoteObject;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.Naming;
 import java.rmi.registry.*;
@@ -46,9 +52,10 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
   }
 
 
+  //Called whenever we wish to write to the log file
   private synchronized void writeToLog(String contents){
     try{
-        FileWriter fw = new FileWriter("rmiServerLogFile.txt", true);
+        FileWriter fw = new FileWriter("p2ServerLogFile.txt", true);
         fw.write(contents + "\n");
         fw.flush();
       }
@@ -57,6 +64,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
       }
   }
 
+
   public int makeNewAccount(String firstName, String lastName, String address){
     synchronized(this){
       int accountID = this.hTable.size() + 1;
@@ -64,8 +72,6 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
       this.hTable.put(accountID, acc);
 
       writeToLog("Request: NewAccount. First/Last/Address: "+firstName+"/"+lastName+"/"+address +". Response: "+accountID);
-
-      // System.out.println(this.hTable);
 
       return accountID;
     }
@@ -84,10 +90,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
       status = "OK";
     }
 
-
     writeToLog("Request: Deposit. AccountID/amount: "+accountID+"/"+amount+". Response: "+status);
-
-
 
     return status;
   }
@@ -109,7 +112,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
         status = "OK";
       }
     }
-    
+
     writeToLog("Request: Withdraw. AccountID/amount: "+accountID+"/"+amount+". Response: "+status);
 
 
@@ -126,6 +129,7 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
 
     return amount;
   }
+
   public String transfer(int accountID, int targetID, int amount){
     synchronized(this){
       String status = ""; //OK or FAIL
@@ -158,9 +162,11 @@ public class RMI_Server extends UnicastRemoteObject implements RMI_Interface {
     }
   }
 
+
+
+  //Main
   public static void main (String args[]) throws Exception {
 
-    System.setSecurityManager (new RMISecurityManager ());
     Hashtable<Integer, Account> newHt = new Hashtable<Integer, Account>();
 
 

@@ -12,7 +12,7 @@ public class Account{
     	this.address = address;
     }
 
-    public String toString() { 
+    public String toString() { //should never be called; for debugging
 	    return "Account info: " + this.accountID + "" + this.balance + this.firstName + this.lastName + this.address + "\n";
 	}
 

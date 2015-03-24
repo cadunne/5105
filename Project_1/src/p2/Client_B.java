@@ -4,7 +4,6 @@ import java.net.*;
 import java.io.*;
 import java.lang.Thread;
 import java.util.Random;
-import java.rmi.RMISecurityManager;
 import java.rmi.Naming;
 
 import p2.RMI_Server;
@@ -25,13 +24,12 @@ public class Client_B extends Thread  {
     this.host = host;
     this.iterationCount = iterationCount;
     this.aids = accounts;
-    // System.out.println ("New client.");
   } 
 
   private void writeToLog(String contents){
     synchronized(this.semaphore){
         try{
-            FileWriter fw = new FileWriter("rmiClientLogFile.txt", true);
+            FileWriter fw = new FileWriter("p2ClientLogFile.txt", true);
             fw.write(contents + "\n");
             fw.close();
           }
@@ -41,14 +39,10 @@ public class Client_B extends Thread  {
     }
   }
 
+  //Threaded method
   public void run(){
 
-    // try{
-    //     Thread.sleep(1000);
-    // }catch(InterruptedException e){
-    //     //do nothing
-    // }
-
+    //Set up RMI connection
     RMI_Interface rmiS = null;
     try{
         rmiS = (RMI_Interface) Naming.lookup ("//" + this.host + "/RMI_Server");
@@ -62,7 +56,7 @@ public class Client_B extends Thread  {
     }
 
 
-
+    //Do [iterationCount] # of transfers
     for(int i=0; i<iterationCount; i++){
         //pic 2 random accounts
         Random generator = new Random(); 
@@ -79,27 +73,16 @@ public class Client_B extends Thread  {
         try{
             String status = rmiS.transfer(aid_1, aid_2, 10);
             if(status.equals("FAIL")){
-                System.out.println("failed");
                 writeToLog("FAIL return status when transferring between accounts "+aid_1+" and "+aid_2+".");
             }
         }catch(java.rmi.RemoteException e){
             //nothing
         }
     }
-
-    // }
-    // //terminate
-
-    // try{
-    //     Thread.sleep(1000);
-    // }catch(InterruptedException e){
-
-    // }
   }
 
 
   public static void main (String args[]) throws IOException {
-    System.setSecurityManager (new RMISecurityManager ()); //set here?
     RMI_Interface rmiS = null;
     try{
         rmiS = (RMI_Interface) Naming.lookup ("//" + args[0] + "/RMI_Server");
@@ -108,7 +91,7 @@ public class Client_B extends Thread  {
     }
 
     //make sure log is made
-    FileWriter fw = new FileWriter("rmiClientLogFile.txt", true);
+    FileWriter fw = new FileWriter("p2ClientLogFile.txt", true);
     fw.write("");
     fw.close();
 

@@ -1,4 +1,0 @@
-FAIL return status when transferring between accounts 192 and 134.
-FAIL return status when transferring between accounts 192 and 178.
-FAIL return status when transferring between accounts 172 and 196.
-FAIL return status when transferring between accounts 172 and 103.

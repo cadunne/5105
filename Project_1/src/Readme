@@ -1,16 +1,42 @@
-HOW TO COMPILE:
+xHOW TO COMPILE/RUN: (tested on kh1262-11 via SSH and OSX 10.9)
 
-Stay in the p1 directory (where the makefile and this readme reside)
+Start in the directory that contains folders p1 and p2 (and this readme).
 
-Run "make clean; make" to compile everything
+To run p1 (the TCP Server):
+
+Run "make clean; make -B p1” to compile all files
 To run the server, simply run "java p1/EchoServer [port]"
-To run the clints, run one of the following:
+To run the client, run one of the following:
 	"java p1/Client_A [hostname] [port]"
 	"java p1/Client_B [hostname] [port] [threadCount] [iterationCount]"
+
+The results will be logged in p1ServerLogFile.txt and p1ClientLogFile.txt (for Client_B)
+
+
+
+To run p2 (the RMI Server):
+
+run “make clean; make -B p2” to compile all files
+In one terminal, run “rmiregistry [num]&”, then “java p2/RMI_Server [num]”
+	-NOTE: “num” must be different if you try to run the server again
+In another terminal, run one of the following for Client_A or Client_B:
+	“java p2/Client_A [hostname]:[num]” //localhost can be different
+	“java p2/Client_B [hostname]:[num] [threadCount] [iterationCount]”
+
+The results will be logged in p2ServerLogFile.txt and p2ClientLogFile.txt (for Client_B)
+
+
 
 
 
 Known bugs:
 -If you try to push up the iteration count too much, you will get some errors as the log file has been opened too many times
 	-Not sure why this happens, because I close the file whenever I write to it, and I also lock it w/ a basic mutex.
+-Some weird memory behavior occurs (involving malloc) when the number of clients and iterations is too large. I anticipate this has to do with the size of the HashTable, or perhaps how many threads are allowed to be blocking at any given time.
 
+
+NOTE FOR TAs:
+-On my OS X machine, I had difficulty getting the example programs provided on the website to actually compile. They were buggy, though it could have been my different OS.
+-One such bug was my SecurityManager wasn’t allowing me to access the registry port I used for my RMI server. I found that I had to edit a permissions file in my JDK to grant all permissions. This didn’t work on linux so I just deleted the security manager. It should work now.
+-My p1 server is called EchoServer; it doesn’t actually echo anything. I just kept the example name.
+-I only synchronized MakeNewAccount and Transfer because they were the only things involved in the tests. Synching any other operation is simple and totally possible by doing the same pattern (the “synchronized” blocks); I just didn’t see the need to do it.
